@@ -1,10 +1,14 @@
 #include <iostream>
 #include <exception>
 #include <random>
+#include <vector>
+#include <memory>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 
 #include "client/client.h"
 
@@ -32,9 +36,19 @@ protected:
 class Application
 {
 public:
+    void init_logger()
+    {
+        auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logfile.txt");
+        std::vector<spdlog::sink_ptr> sinks = {stdout_sink, file_sink};
+        auto logger = std::make_shared<spdlog::logger>("logger", std::begin(sinks), std::end(sinks));
+        spdlog::register_logger(logger);
+    }
     int run()
     {
         try {
+
+            init_logger();
 
             boost::asio::io_context io_context;
 
@@ -58,7 +72,7 @@ public:
             }
 
         } catch (std::exception & e) {
-            spdlog::info("Exception: {}", e.what());
+            spdlog::error("Exception: {}", e.what());
         }
 
         return 0;
