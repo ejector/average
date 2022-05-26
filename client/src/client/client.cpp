@@ -22,9 +22,9 @@ void Client::write(int data)
     boost::asio::write(_socket, boost::asio::buffer(&data, sizeof(data)));
 }
 
-int Client::read()
+double Client::read()
 {
-    int data;
+    double data;
     boost::asio::read(_socket, boost::asio::buffer(&data, sizeof(data)));
     return data;
 }

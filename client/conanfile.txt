@@ -1,6 +1,6 @@
 [requires]
- boost/1.79.0
- spdlog/1.10.0
+boost/1.79.0
+spdlog/1.10.0
 
 [generators]
 cmake_find_package

@@ -20,7 +20,9 @@ set(SOURCES
     src/client/client.cpp)
 
 set(HEADERS
-    src/client/client.h)
+    src/client/client.h
+    src/application.h
+    src/randomizer.h)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_link_libraries(${PROJECT_NAME} Boost::boost spdlog::spdlog)
