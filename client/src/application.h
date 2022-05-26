@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <boost/asio.hpp>
+#include <boost/interprocess/detail/os_thread_functions.hpp>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -20,13 +21,22 @@ namespace average {
 class Application
 {
 public:
+    Application(std::string &ip, int port)
+        : _ip(ip)
+        , _port(port)
+    {
+
+    }
     void init_logger()
     {
         auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("logfile.txt");
+
+        std::string file_name = fmt::format("client_{}.log", boost::interprocess::ipcdetail::get_current_process_id());
+
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(file_name);
         std::vector<spdlog::sink_ptr> sinks = {stdout_sink, file_sink};
         auto logger = std::make_shared<spdlog::logger>("logger", std::begin(sinks), std::end(sinks));
-        spdlog::register_logger(logger);
+        spdlog::set_default_logger(logger);
     }
     int run()
     {
@@ -46,7 +56,7 @@ public:
             signals.async_wait(exit_handler);
 
             Client client(io_context);
-            client.connect("127.0.0.1", 55123);
+            client.connect(_ip, _port);
 
             Randomizer randomizer(0, 1023);
 
@@ -61,6 +71,9 @@ public:
 
         return 0;
     }
+protected:
+    std::string _ip;
+    int _port = 0;
 };
 
 } // namespace average

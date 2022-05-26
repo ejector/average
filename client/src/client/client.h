@@ -15,8 +15,8 @@ public:
 
     Client(io_context &context);
     void connect(const std::string &ip, int port);
-    void write(int random);
-    double read();
+    void write_random(int value);
+    double read_average();
 
 protected:
     io_context &_context;

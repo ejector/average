@@ -1,20 +1,24 @@
+#include <string>
+
+#include <spdlog/spdlog.h>
+
 #include "application.h"
 
 int main(int argc, char ** argv)
 {
     try {
-        std::string ip = "127.0.0.1";
         int port = 55123;
+        int save_period_sec = 5;
 
         if (argc == 2) {
-            ip = argv[1];
+            port = std::stoi(argv[1]);
         }
 
         if (argc == 3) {
-            port = std::stoi(argv[2]);
+            save_period_sec = std::stoi(argv[2]);
         }
 
-        average::Application app(ip, port);
+        average::Application app(port, save_period_sec);
         return app.run();
     }
     catch (std::exception &e) {
