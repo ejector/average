@@ -43,7 +43,7 @@ private:
             _async = std::async(std::launch::async, [this, self, random = _random]() {
                 _random_storage.insert(_random);
                 _average = _random_storage.average();
-                boost::asio::asio_handler_invoke([this, self, average = _average](){
+                boost::asio::post([this, self, average = _average](){
                     write(average);
                 });
             });

@@ -20,8 +20,9 @@ class Application
 public:
     Application(int port, int save_period_sec)
         : _port(port)
+        , _save_period_sec(save_period_sec)
         , _signals(_io_context, SIGINT, SIGTERM)
-        , _save_timer(_io_context, boost::posix_time::seconds(save_period_sec))
+        , _save_timer(_io_context, save_period_sec)
     {
 
     }
@@ -45,17 +46,21 @@ public:
     }
     void start_save_data_timer()
     {
-        _save_timer.async_wait([&](const boost::system::error_code& ec) {
+        _save_timer = boost::asio::deadline_timer(_io_context, boost::posix_time::seconds(_save_period_sec));
+        _save_timer.async_wait([this](const boost::system::error_code& ec) {
             if (ec) {
                 spdlog::error("Timer error: {}", ec.message());
                 return;
             }
             static std::future<void> async;
-            async = std::async(std::launch::async, [set = _random_storage.copy_data()]() {
+            async = std::async(std::launch::async, [this, set = _random_storage.copy_data()]() {
                 std::ofstream file("random_set.bin", std::ios::binary|std::ios::trunc);
                 for (auto&& item: set) file << item;
+                spdlog::info("Saved data to file");
+                boost::asio::post([this](){
+                    start_save_data_timer();
+                });
             });
-            start_save_data_timer();
         });
     }
     int run()
@@ -78,6 +83,7 @@ public:
     }
 protected:
     int _port = 0;
+    int _save_period_sec = 0;
     boost::asio::io_context _io_context;
     boost::asio::signal_set _signals;
     boost::asio::deadline_timer _save_timer;
