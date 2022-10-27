@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include <string>
 
 #include <spdlog/spdlog.h>
@@ -21,9 +23,9 @@ int main(int argc, char ** argv)
         average::Application app(port, save_period_sec);
         return app.run();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         spdlog::error("Exception: {}", e.what());
     }
 
-    return 1;
+    return EXIT_FAILURE;
 }

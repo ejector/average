@@ -1,6 +1,8 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <cstdlib>
+
 #include <set>
 #include <fstream>
 
@@ -15,10 +17,10 @@
 
 namespace average {
 
-class Application
+class Application final
 {
 public:
-    Application(int port, int save_period_sec)
+    explicit Application(int port, int save_period_sec)
         : _port(port)
         , _save_period_sec(save_period_sec)
         , _signals(_io_context, SIGINT, SIGTERM)
@@ -26,7 +28,7 @@ public:
     {
 
     }
-    void init_logger()
+    void init_logger() const
     {
         auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
@@ -75,11 +77,13 @@ public:
 
             _io_context.run();
 
-        } catch (std::exception & e) {
+            spdlog::info("Finished all work. Exit.");
+
+        } catch (const std::exception & e) {
             spdlog::error("Exception: {}", e.what());
         }
 
-        return 0;
+        return EXIT_SUCCESS;
     }
 protected:
     int _port = 0;
