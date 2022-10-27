@@ -12,12 +12,13 @@
 
 namespace average {
 
-class Session : public std::enable_shared_from_this<Session>
+class Session final : public std::enable_shared_from_this<Session>
 {
 public:
     using RandomStorageSetInt = RandomStorage<std::set<int>>;
     using tcp_socket = boost::asio::ip::tcp::socket;
-    Session(RandomStorageSetInt& random_storage, tcp_socket socket)
+
+    explicit Session(RandomStorageSetInt& random_storage, tcp_socket socket)
         : _random_storage(random_storage)
         , _socket(std::move(socket))
     {
@@ -31,9 +32,8 @@ public:
 private:
     void read()
     {
-        auto self(shared_from_this());
         _socket.async_read_some(boost::asio::buffer(&_random, sizeof(_random)),
-                                [this, self](boost::system::error_code ec, std::size_t)
+                                [this, self = shared_from_this()](boost::system::error_code ec, std::size_t)
         {
             if (ec) {
                 spdlog::error("Read error: {}", ec.message());
@@ -53,10 +53,9 @@ private:
 
     void write(double average)
     {
-        auto self(shared_from_this());
         _average = average;
         boost::asio::async_write(_socket, boost::asio::buffer(&_average, sizeof(_average)),
-                                 [this, self](boost::system::error_code ec, std::size_t)
+                                 [this, self = shared_from_this()](boost::system::error_code ec, std::size_t)
         {
             if (ec) {
                 spdlog::error("Write error: {}", ec.message());
@@ -73,14 +72,15 @@ private:
     double _average = 0.0;
 };
 
-class Server
+class Server final
 {
 public:
     using RandomStorageSetInt = RandomStorage<std::set<int>>;
     using tcp_endpoint = boost::asio::ip::tcp::endpoint;
     using tcp_socket =  boost::asio::ip::tcp::socket;
-    using tcp_acceptot = boost::asio::ip::tcp::acceptor;
-    Server(RandomStorageSetInt& random_storage, boost::asio::io_context& io_context, int port)
+    using tcp_acceptor = boost::asio::ip::tcp::acceptor;
+
+    explicit Server(RandomStorageSetInt& random_storage, boost::asio::io_context& io_context, int port)
         : _random_storage(random_storage)
         , _acceptor(io_context, tcp_endpoint(boost::asio::ip::tcp::v4(), port))
     {
@@ -103,7 +103,7 @@ private:
     }
 private:
     RandomStorageSetInt& _random_storage;
-    tcp_acceptot  _acceptor;
+    tcp_acceptor  _acceptor;
 };
 
 } // namespace average
