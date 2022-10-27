@@ -1,5 +1,12 @@
 #include "application.h"
 
+#include <cstdlib>
+
+#include <string>
+#include <exception>
+
+#include <spdlog/spdlog.h>
+
 int main(int argc, char ** argv)
 {
     try {
@@ -21,5 +28,5 @@ int main(int argc, char ** argv)
         spdlog::error("Exception: {}", e.what());
     }
 
-    return 1;
+    return EXIT_FAILURE;
 }

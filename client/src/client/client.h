@@ -7,19 +7,18 @@
 
 namespace average {
 
-class Client
+class Client final
 {
 public:
     using io_context = boost::asio::io_context;
     using tcp_socket = boost::asio::ip::tcp::socket;
 
-    Client(io_context &context);
+    explicit Client(io_context &context);
     void connect(const std::string &ip, int port);
     void write_random(int value);
     double read_average();
 
 protected:
-    io_context &_context;
     tcp_socket _socket;
 };
 

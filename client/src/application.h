@@ -1,9 +1,10 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <cstdlib>
+
 #include <iostream>
 #include <exception>
-
 #include <vector>
 #include <memory>
 
@@ -18,16 +19,16 @@
 
 namespace average {
 
-class Application
+class Application final
 {
 public:
-    Application(std::string &ip, int port)
+    explicit Application(const std::string &ip, int port)
         : _ip(ip)
         , _port(port)
     {
 
     }
-    void init_logger()
+    void init_logger() const
     {
         auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
@@ -65,11 +66,12 @@ public:
                 spdlog::info("average: {}", client.read_average());
             }
 
-        } catch (std::exception & e) {
+        } catch (const std::exception & e) {
             spdlog::error("Exception: {}", e.what());
+            return EXIT_FAILURE;
         }
 
-        return 0;
+        return EXIT_SUCCESS;
     }
 protected:
     std::string _ip;

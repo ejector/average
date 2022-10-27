@@ -5,10 +5,10 @@
 
 namespace average {
 
-class Randomizer
+class Randomizer final
 {
 public:
-    Randomizer(int min, int max)
+    explicit Randomizer(int min, int max)
         : _generator(_random_device())
         , _distrib(min, max)
     {

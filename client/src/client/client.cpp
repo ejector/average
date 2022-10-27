@@ -1,14 +1,11 @@
 #include "client.h"
 
-#include <boost/asio.hpp>
-
 using namespace boost::asio;
 
 namespace average {
 
 Client::Client(io_context &context)
-    : _context(context)
-    , _socket(context)
+    : _socket(context)
 {
 }
 
