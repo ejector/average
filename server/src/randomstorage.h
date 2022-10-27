@@ -33,7 +33,7 @@ public:
     }
     T copy_data() const
     {
-        std::scoped_lock lock(_mutex);
+        std::lock_guard lock(_mutex);
         return _data;
     }
 protected:
